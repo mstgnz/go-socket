@@ -8,22 +8,17 @@ import (
 )
 
 func main() {
-	port := "3333"
+	port := "3000"
+
+	http.Handle("/", http.FileServer(http.Dir("public")))
 
 	socket := NewSocket()
-	http.Handle("/", websocket.Handler(socket.handler))
+	http.Handle("/ws", websocket.Handler(socket.handler))
 
 	done := make(chan bool)
 	go func() {
 		panic(http.ListenAndServe(":"+port, nil))
 	}()
-	log.Println("Started Websocket on :3333")
+	log.Println("Started Websocket on :" + port)
 	<-done
 }
-
-/*
-	use commands in browser console tab
-	let socket = new WebSocket("ws://localhost:3333")
-	socket.onmessage = (event) => {console.log("message: ", event.data)}
-	socket.send("test message")
-*/
