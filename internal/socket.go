@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/mstgnz/go-socket/types"
+	"github.com/mstgnz/go-socket/internal/types"
 	"golang.org/x/net/websocket"
 )
 
