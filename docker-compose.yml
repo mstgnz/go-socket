@@ -1,0 +1,11 @@
+version: "3.5"
+
+services:
+  gosocket:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: go-socket
+    restart: always
+    ports:
+      - "3000:3000"

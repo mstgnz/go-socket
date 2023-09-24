@@ -14,10 +14,21 @@ Follow the steps below to start the project locally or on a web server.
 ### Installation
 
 1. Clone this repository to a local directory:
+    ```bash
+    git clone https://github.com/mstgnz/go-socket
+    cd go-socket
+    ```
 
-```bash
-git clone https://github.com/mstgnz/go-socket
-```
+2. Run project
+    ```bash
+    docker build -t go-socket:latest . && docker run -d --restart=always -p 3000:3000 --name=go-socket go-socket
+    ```
+   OR
+    ```bash
+    docker compose up -d
+    ```
+
+3. Go to browser open the link http://localhost:3000
 
 ### Usage
 Launch the application in your browser and join with a random username.
