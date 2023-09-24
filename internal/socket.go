@@ -1,3 +1,8 @@
+// Package internal /*
+/*
+## License
+This project is licensed under the MIT Licence. Refer to https://github.com/mstgnz/go-socket/blob/main/LICENSE for more information.
+*/
 package internal
 
 import (

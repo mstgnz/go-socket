@@ -26,3 +26,6 @@ Type a message in the text box at the bottom and press "Enter" to send a message
 
 ### Contributing
 This project is open-source, and contributions are welcome. Feel free to contribute or provide feedback of any kind.
+
+### License
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/mstgnz/go-socket/blob/main/LICENSE) file for more details.
