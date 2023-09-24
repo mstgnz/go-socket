@@ -3,8 +3,8 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -o gosocket ./cmd
+RUN GOOS=linux CGO_ENABLED=0 go build -o goSocket ./cmd
 
-FROM scratch as deploy
-COPY --from=builder /app/gosocket /bin/app
-ENTRYPOINT ["/bin/app"]
+FROM alpine:latest
+COPY --from=builder /app /app
+ENTRYPOINT ["/app/goSocket"]
