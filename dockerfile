@@ -5,6 +5,6 @@ RUN go mod download
 COPY . .
 RUN GOOS=linux CGO_ENABLED=0 go build -o goSocket ./cmd
 
-FROM scratch
+FROM scratch as deploy
 COPY --from=builder /app /app
 ENTRYPOINT ["/app/goSocket"]
