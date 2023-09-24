@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ func NewSocket() *Socket {
 	}
 }
 
-func (s *Socket) handler(ws *websocket.Conn) {
+func (s *Socket) Handler(ws *websocket.Conn) {
 
 	defer func(ws *websocket.Conn) {
 		s.disconnect(ws)
@@ -77,7 +77,6 @@ func (s *Socket) disconnect(ws *websocket.Conn) {
 	HandleLog(msg, nil)
 	s.connections[ws] = false
 	players.DelPlayer(request.Player.Name)
-	messages.DelMessage(request.Player.Name)
 	delete(s.connections, ws)
 	s.broadcast(types.Response{
 		Type:    "disconnect",

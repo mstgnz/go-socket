@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/mstgnz/go-socket/internal"
 	"golang.org/x/net/websocket"
 )
 
@@ -12,8 +13,8 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("public")))
 
-	socket := NewSocket()
-	http.Handle("/ws", websocket.Handler(socket.handler))
+	socket := internal.NewSocket()
+	http.Handle("/ws", websocket.Handler(socket.Handler))
 
 	done := make(chan bool)
 	go func() {
