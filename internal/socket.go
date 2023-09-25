@@ -110,8 +110,8 @@ func (s *Socket) animateHandle(_ *websocket.Conn) {
 
 func (s *Socket) nameHandle(_ *websocket.Conn) {
 	if player := players.FindPlayer(request.Player.Name); player != nil {
-		player.Name = request.Player.Name
-		s.broadcast(types.Response{Type: request.Type, Message: "change", Player: *player})
+		s.broadcast(types.Response{Type: request.Type, Message: request.Message, Player: *player})
+		player.Name = request.Message
 	}
 }
 

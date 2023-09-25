@@ -53,6 +53,9 @@ class Socket {
                 case "error":
                     this.handleError(response)
                     break
+                case "name":
+                    this.handleName(response)
+                    break
                 case "disconnect":
                     this.handleDisconnect(response)
                     break
@@ -73,13 +76,12 @@ class Socket {
     }
 
     handleInit(response) {
-        this.players = response.players ? response.players : []
-        this.messages = response.messages ? response.messages : []
         this.handlePlayers(response)
         this.handleMessages(response)
     }
 
     handlePlayers(response){
+        this.players = response.players ? response.players : []
         response.players.forEach((player) => {
             if (player.name === this.player.name) {
                 this.player = player;
@@ -89,6 +91,7 @@ class Socket {
     }
 
     handleMessages(response) {
+        this.messages = response.messages ? response.messages : []
         if(response.messages){
             response.messages.forEach(message => {
                 this.addMessageToChat(`${message.name}: ${message.message}`)
@@ -122,6 +125,16 @@ class Socket {
         }
     }
 
+    handleName(response) {
+        if (response.player.name !== this.player.name) {
+            const player = this.players.find((player) => player.name === response.player.name)
+            if(player){
+                this.changeName(player, response.message)
+                player.name = response.message
+            }
+        }
+    }
+
     handleDisconnect(response) {
         this.players = this.players.filter((p) => p.name !== response.player.name);
         this.addMessageToChat(`[SERVER]: ${response.player.name} disconnected`)
@@ -132,23 +145,6 @@ class Socket {
         this.connected.style.display = "none"
         this.unconnected.style.display = "block"
         this.unconnected.innerHTML = response.message
-    }
-
-    addPlayerToGameArea(player) {
-        this.game.innerHTML += `<div class="circle" id="${player.name}" style="left:${player.position.x}px;top:${player.position.y}px; background-color: ${player.color}">
-            <div class="relative">
-                <span class="name">${player.name}</span>
-                <div class="message"></div>
-            </div>
-        </div>`;
-    }
-
-    addMessageToChat(message) {
-        this.chat.innerHTML += `<div class="item">
-            <div class="content">
-                <span>${message}</span>
-            </div>
-        </div>`;
     }
 
     scrollTop() {
@@ -182,6 +178,7 @@ class Socket {
             this.addMessageToChat(`${this.player.name}: ${this.input.value}`)
             this.send("message", this.input.value)
             this.showBubble(this.player.name, this.input.value)
+            this.checkName(this.input.value)
             this.input.value = "";
         }
     }
@@ -200,12 +197,14 @@ class Socket {
 
     showBubble(name, message) {
         const element = document.getElementById(name)
-        const messageElement = element.querySelector('.message')
-        messageElement.style.display = 'block';
-        messageElement.innerHTML = message;
-        setTimeout(function () {
-            messageElement.style.display = 'none';
-        }, this.bubbleLifeTime(message))
+        if(element){
+            const messageElement = element.querySelector('.message')
+            messageElement.style.display = 'block';
+            messageElement.innerHTML = message;
+            setTimeout(function () {
+                messageElement.style.display = 'none';
+            }, this.bubbleLifeTime(message))
+        }
     }
 
     bubbleLifeTime(message) {
@@ -214,6 +213,40 @@ class Socket {
         const msPerLetter = 40;
         let bubbleTime = min + message.length * msPerLetter;
         return bubbleTime > max ? max : bubbleTime;
+    }
+
+    checkName(nameCommand) {
+        if(nameCommand.startsWith(":change-name") && nameCommand.split(" ").length === 2){
+            const newName = nameCommand.split(" ")[1]
+            this.send("name", newName)
+            this.changeName(this.player, newName)
+            this.player.name = nameCommand.split(" ")[1]
+        }
+    }
+
+    changeName(player, name){
+        const element = document.getElementById(player.name)
+        if(element){
+            const nameElement = element.querySelector('.name')
+            nameElement.innerHTML = name
+        }
+    }
+
+    addPlayerToGameArea(player) {
+        this.game.innerHTML += `<div class="circle" id="${player.name}" style="left:${player.position.x}px;top:${player.position.y}px; background-color: ${player.color}">
+            <div class="relative">
+                <span class="name">${player.name}</span>
+                <div class="message"></div>
+            </div>
+        </div>`;
+    }
+
+    addMessageToChat(message) {
+        this.chat.innerHTML += `<div class="item">
+            <div class="content">
+                <span>${message}</span>
+            </div>
+        </div>`;
     }
 }
 
