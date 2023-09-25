@@ -36,6 +36,7 @@ class Socket {
         // on message
         this.socket.onmessage = (event) => {
             const response = JSON.parse(event.data)
+            //console.log(response)
             switch (response.type) {
                 case "init":
                     this.handleInit(response)
@@ -48,6 +49,9 @@ class Socket {
                     break
                 case "message":
                     this.handleMessage(response)
+                    break
+                case "error":
+                    this.handleError(response)
                     break
                 case "disconnect":
                     this.handleDisconnect(response)
@@ -122,6 +126,12 @@ class Socket {
         this.players = this.players.filter((p) => p.name !== response.player.name);
         this.addMessageToChat(`[SERVER]: ${response.player.name} disconnected`)
         this.scrollTop()
+    }
+
+    handleError(response){
+        this.connected.style.display = "none"
+        this.unconnected.style.display = "block"
+        this.unconnected.innerHTML = response.message
     }
 
     addPlayerToGameArea(player) {

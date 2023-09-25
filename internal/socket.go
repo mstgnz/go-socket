@@ -6,6 +6,7 @@ This project is licensed under the MIT Licence. Refer to https://github.com/mstg
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -32,6 +33,11 @@ func (s *Socket) Handler(ws *websocket.Conn) {
 	defer func(ws *websocket.Conn) {
 		s.disconnect(ws)
 	}(ws)
+
+	if err := s.limitHandle(ws); err != nil {
+		s.emit(ws, types.Response{Type: "error", Message: err.Error()})
+		delete(s.connections, ws)
+	}
 
 	for {
 		if err := websocket.JSON.Receive(ws, &request); err != nil {
@@ -107,6 +113,13 @@ func (s *Socket) nameHandle(_ *websocket.Conn) {
 		player.Name = request.Player.Name
 		s.broadcast(types.Response{Type: request.Type, Message: "change", Player: *player})
 	}
+}
+
+func (s *Socket) limitHandle(_ *websocket.Conn) error {
+	if len(players) > 50 {
+		return errors.New("maximum limit reached")
+	}
+	return nil
 }
 
 func (s *Socket) disconnect(ws *websocket.Conn) {
