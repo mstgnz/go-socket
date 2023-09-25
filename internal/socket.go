@@ -42,6 +42,7 @@ func (s *Socket) Handler(ws *websocket.Conn) {
 			s.emit(ws, types.Response{Type: "error", Message: err.Error()})
 			continue
 		}
+		s.connections[ws] = true
 		switch request.Type {
 		case "new":
 			s.newHandle(ws)
@@ -68,27 +69,12 @@ func (s *Socket) emit(ws *websocket.Conn, response types.Response) {
 func (s *Socket) broadcast(response types.Response) {
 	for ws := range s.connections {
 		if s.connections[ws] {
-			s.emit(ws, response)
 			// TODO to many connection handle
-			/*go func(ws *websocket.Conn) {
+			go func(ws *websocket.Conn) {
 				s.emit(ws, response)
-			}(ws)*/
+			}(ws)
 		}
 	}
-}
-
-func (s *Socket) disconnect(ws *websocket.Conn) {
-	msg := fmt.Sprintf("%s disconnected", request.Player.Name)
-	HandleLog(msg, nil)
-	s.connections[ws] = false
-	players.DelPlayer(request.Player.Name)
-	delete(s.connections, ws)
-	s.broadcast(types.Response{
-		Type:    "disconnect",
-		Message: msg,
-		Player:  request.Player,
-	})
-	_ = ws.Close()
 }
 
 func (s *Socket) newHandle(ws *websocket.Conn) {
@@ -99,7 +85,7 @@ func (s *Socket) newHandle(ws *websocket.Conn) {
 	})
 	HandleLog(request.Player.Name+" connected", nil)
 	s.emit(ws, types.Response{Type: "init", Message: "login successfully", Player: player, Players: players, Messages: messages})
-	s.broadcast(types.Response{Type: request.Type, Message: "new player connected", Player: player})
+	s.broadcast(types.Response{Type: request.Type, Message: "new player connected", Player: player, Messages: messages})
 }
 
 func (s *Socket) messageHandle(ws *websocket.Conn) {
@@ -121,4 +107,18 @@ func (s *Socket) nameHandle(ws *websocket.Conn) {
 		player.Name = request.Player.Name
 		s.broadcast(types.Response{Type: request.Type, Message: "change", Player: *player})
 	}
+}
+
+func (s *Socket) disconnect(ws *websocket.Conn) {
+	msg := fmt.Sprintf("%s disconnected", request.Player.Name)
+	HandleLog(msg, nil)
+	s.connections[ws] = false
+	players.DelPlayer(request.Player.Name)
+	delete(s.connections, ws)
+	s.broadcast(types.Response{
+		Type:    "disconnect",
+		Message: msg,
+		Player:  request.Player,
+	})
+	_ = ws.Close()
 }

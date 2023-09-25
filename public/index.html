@@ -7,12 +7,15 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <div id="game"></div>
-    <div id="chat"></div>
-    <form id="form">
-        <label for="input"></label>
-        <input type="text" maxlength="100" minlength="1" id="input" placeholder="Send Message" autofocus="autofocus" />
-    </form>
+    <div id="connected">
+        <div id="game"></div>
+        <div id="chat"></div>
+        <form id="form">
+            <label for="input"></label>
+            <input type="text" maxlength="100" minlength="1" id="input" placeholder="Send Message" autofocus="autofocus" />
+        </form>
+    </div>
+    <h1 id="unconnected">Websocket Not Connected</h1>
 <script src="index.js"></script>
 </body>
 </html>

@@ -117,3 +117,11 @@ span.change a{
     margin-bottom: 3px;
     cursor: pointer;
 }
+#unconnected{
+    top: 100px;
+    color: white;
+    display: none;
+    font-size: 40px;
+    text-align: center;
+    text-shadow: 2px 2px #000;
+}

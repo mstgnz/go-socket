@@ -12,27 +12,28 @@ class Socket {
         this.chat = document.getElementById("chat")
         this.form = document.getElementById("form")
         this.input = document.getElementById("input")
-        this.player = {
-            name: Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 5)
-        }
-        this.socket = new WebSocket("ws://localhost:3000/ws")
-        this.init()
-    }
-
-    init() {
+        this.connected = document.getElementById("connected")
+        this.unconnected = document.getElementById("unconnected")
         this.game.addEventListener("click", this.onClickPlayer)
         this.input.addEventListener("keypress", this.onMessage)
         this.form.addEventListener("submit", (event) => {
             event.preventDefault()
         })
-        this.initSocket()
+        this.player = {
+            name: Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 5)
+        }
+        this.socket = new WebSocket("ws://localhost:3000/ws")
+        this.socketProcess()
     }
 
-    initSocket() {
+    socketProcess() {
+
+        // on open
         this.socket.onopen = () => {
             this.send("new")
         }
 
+        // on message
         this.socket.onmessage = (event) => {
             const response = JSON.parse(event.data)
             switch (response.type) {
@@ -54,14 +55,22 @@ class Socket {
             }
         }
 
+        // on close
         this.socket.onclose = () => {
-            console.log("Disconnected")
+            this.connected.style.display = "none"
+            this.unconnected.style.display = "block"
+        }
+
+        // on error
+        this.socket.onerror = (err) => {
+            this.connected.style.display = "none"
+            this.unconnected.style.display = "block"
         }
     }
 
     handleInit(response) {
-        this.players = response.players;
-        this.messages = response.messages
+        this.players = response.players ? response.players : []
+        this.messages = response.messages ? response.messages : []
         this.handlePlayers(response)
         this.handleMessages(response)
     }
@@ -136,8 +145,8 @@ class Socket {
     animateElement(player) {
         const element = document.getElementById(player.name)
         const center = this.objSize / 2;
-        element.style.left = player.position.x - center + "px";
-        element.style.top = player.position.y - center + "px";
+        element.style.left = (player.position.x - center) + "px";
+        element.style.top = (player.position.y - center) + "px";
         this.animate = false;
     }
 
@@ -148,7 +157,7 @@ class Socket {
                 message: message,
                 player: this.player
             })
-        );
+        )
     }
 
     onMessage = (event) => {
@@ -191,4 +200,4 @@ class Socket {
     }
 }
 
-const socket = new Socket()
+new Socket()
