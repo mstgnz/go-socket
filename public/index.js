@@ -6,8 +6,8 @@ class Socket {
     constructor() {
         this.players = [];
         this.messages = [];
-        this.animate = false;
         this.objSize = 0;
+        this.isAnimate = false;
         this.game = document.getElementById("game")
         this.chat = document.getElementById("chat")
         this.form = document.getElementById("form")
@@ -84,10 +84,22 @@ class Socket {
         })
     }
 
-    handleNewPlayer(response) {
-        this.players.push(response.player)
-        this.addMessageToChat(`[SERVER] ${response.player.name} connected`)
+    handleMessages(response) {
+        if(response.messages){
+            response.messages.forEach(message => {
+                this.addMessageToChat(`${message.name}: ${message.message}`)
+            })
+        }
         this.scrollTop()
+    }
+
+    handleNewPlayer(response) {
+        if(this.player.name !== response.player.name){
+            this.players.push(response.player)
+            this.addPlayerToGameArea(response.player)
+            this.addMessageToChat(`[SERVER] ${response.player.name} connected`)
+            this.scrollTop()
+        }
     }
 
     handleAnimate(response) {
@@ -98,19 +110,12 @@ class Socket {
     }
 
     handleMessage(response) {
-        this.messages.push({"name": response.player.name, "message": response.message})
-        this.addMessageToChat(`${response.player.name}: ${response.message}`)
-        this.showBubble(response.player.name, response.message)
-        this.scrollTop()
-    }
-
-    handleMessages(response) {
-        if(response.messages){
-            response.messages.forEach(message => {
-                this.addMessageToChat(`${message.name}: ${message.message}`)
-            })
+        if(response.player.name !== this.player.name){
+            this.messages.push({"name": response.player.name, "message": response.message})
+            this.addMessageToChat(`${response.player.name}: ${response.message}`)
+            this.showBubble(response.player.name, response.message)
+            this.scrollTop()
         }
-        this.scrollTop()
     }
 
     handleDisconnect(response) {
@@ -144,10 +149,12 @@ class Socket {
 
     animateElement(player) {
         const element = document.getElementById(player.name)
-        const center = this.objSize / 2;
-        element.style.left = (player.position.x - center) + "px";
-        element.style.top = (player.position.y - center) + "px";
-        this.animate = false;
+        if(element){
+            const center = this.objSize / 2;
+            element.style.left = (player.position.x - center) + "px";
+            element.style.top = (player.position.y - center) + "px";
+            this.isAnimate = false;
+        }
     }
 
     send(type, message = "") {
@@ -174,8 +181,8 @@ class Socket {
         const center = this.objSize / 2;
         this.player.position.x = event.offsetX - center;
         this.player.position.y = event.offsetY - center;
-        if (!this.animate) {
-            this.animate = true;
+        if (!this.isAnimate) {
+            this.isAnimate = true;
             this.send("animate","")
             this.animateElement(this.player)
         }

@@ -88,21 +88,21 @@ func (s *Socket) newHandle(ws *websocket.Conn) {
 	s.broadcast(types.Response{Type: request.Type, Message: "new player connected", Player: player, Messages: messages})
 }
 
-func (s *Socket) messageHandle(ws *websocket.Conn) {
+func (s *Socket) messageHandle(_ *websocket.Conn) {
 	messages = append(messages, types.Message{Name: request.Player.Name, Message: request.Message})
 	if player := players.FindPlayer(request.Player.Name); player != nil {
 		s.broadcast(types.Response{Type: request.Type, Message: request.Message, Player: *player})
 	}
 }
 
-func (s *Socket) animateHandle(ws *websocket.Conn) {
+func (s *Socket) animateHandle(_ *websocket.Conn) {
 	if player := players.FindPlayer(request.Player.Name); player != nil {
 		player.Position = request.Player.Position
 		s.broadcast(types.Response{Type: request.Type, Message: "animate", Player: *player})
 	}
 }
 
-func (s *Socket) nameHandle(ws *websocket.Conn) {
+func (s *Socket) nameHandle(_ *websocket.Conn) {
 	if player := players.FindPlayer(request.Player.Name); player != nil {
 		player.Name = request.Player.Name
 		s.broadcast(types.Response{Type: request.Type, Message: "change", Player: *player})
