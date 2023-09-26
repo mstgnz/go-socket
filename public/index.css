@@ -1,7 +1,7 @@
 body{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 14px;
-    background: #1F252D url("https://source.unsplash.com/random/1920x1080") no-repeat center fixed !important;
+    background: #1F252D url("https://source.unsplash.com/random/1920x1080") no-repeat center fixed;
     background-size: cover;
 }
 

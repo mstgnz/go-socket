@@ -178,20 +178,23 @@ class Socket {
             this.addMessageToChat(`${this.player.name}: ${this.input.value}`)
             this.send("message", this.input.value)
             this.showBubble(this.player.name, this.input.value)
-            this.checkName(this.input.value)
+            this.checkCommand(this.input.value)
             this.input.value = "";
         }
     }
 
     onClickPlayer = (event) => {
-        this.objSize = document.getElementById(this.player.name).offsetWidth;
-        const center = this.objSize / 2;
-        this.player.position.x = event.offsetX - center;
-        this.player.position.y = event.offsetY - center;
-        if (!this.isAnimate) {
-            this.isAnimate = true;
-            this.send("animate","")
-            this.animateElement(this.player)
+        const element = document.getElementById(this.player.name)
+        if(element){
+            this.objSize = element.offsetWidth;
+            const center = this.objSize / 2;
+            this.player.position.x = event.offsetX - center;
+            this.player.position.y = event.offsetY - center;
+            if (!this.isAnimate) {
+                this.isAnimate = true;
+                this.send("animate","")
+                this.animateElement(this.player)
+            }
         }
     }
 
@@ -215,12 +218,28 @@ class Socket {
         return bubbleTime > max ? max : bubbleTime;
     }
 
-    checkName(nameCommand) {
-        if(nameCommand.startsWith(":change-name") && nameCommand.split(" ").length === 2){
-            const newName = nameCommand.split(" ")[1]
-            this.send("name", newName)
-            this.changeName(this.player, newName)
-            this.player.name = nameCommand.split(" ")[1]
+    checkCommand(command){
+        command = command.split(" ")
+        if(command[1]) {
+            switch (command[0]) {
+                case ":change-name":
+                    const newName = command[1].substring(0, 5)
+                    this.send("name", newName)
+                    this.changeName(this.player, newName)
+                    this.player.name = command[1];
+                    break
+                case ":change-bg":
+                    const newBg = command[1];
+                    document.body.style.backgroundImage = `url(${newBg})`
+                    break
+            }
+        }
+        if(command[0] === ":change-bg"){
+            fetch("https://source.unsplash.com/random/1920x1080").then((response) => {
+                if (response.ok) {
+                    document.body.style.backgroundImage = `url(${response.url})`
+                }
+            })
         }
     }
 
