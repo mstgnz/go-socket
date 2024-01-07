@@ -26,7 +26,8 @@ body{
     font-size: 12px;
     font-weight: 700;
     position: absolute;
-    top: 100px
+    top: 100px;
+    transition: left 0.5s ease, top 0.5s ease;
 }
 
 .circle .relative{
